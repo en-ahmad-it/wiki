@@ -1,0 +1,46 @@
+{
+  "name": "wikimasters",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "dev": "next dev --turbopack",
+    "build": "next build --turbopack",
+    "start": "next start",
+    "lint": "biome check",
+    "format": "biome format --write",
+    "db:seed": "tsx src/db/seed.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate"
+  },
+  "dependencies": {
+    "@hexclave/next": "^1.0.11",
+    "@neondatabase/serverless": "^1.1.0",
+    "@radix-ui/react-navigation-menu": "^1.2.14",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@uiw/react-md-editor": "^4.0.8",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "dotenv": "^17.4.2",
+    "drizzle-orm": "^0.45.2",
+    "lucide-react": "^0.544.0",
+    "next": "^16.0.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-markdown": "^10.1.0",
+    "tailwind-merge": "^3.3.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.2.0",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.10",
+    "drizzle-seed": "^0.3.1",
+    "tailwindcss": "^4",
+    "tsx": "^4.22.5",
+    "tw-animate-css": "^1.3.8",
+    "typescript": "^5"
+  }
+}

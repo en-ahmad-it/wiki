@@ -1,0 +1,11 @@
+<!-- This is a placeholder for the image. In a real application, you would have an actual image file here. -->
+<!-- For demonstration purposes, we'll create an SVG placeholder -->
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="400" fill="#f1f5f9"/>
+  <text x="400" y="200" font-family="Arial, sans-serif" font-size="24" fill="#64748b" text-anchor="middle" dominant-baseline="middle">
+    Placeholder Image
+  </text>
+  <text x="400" y="230" font-family="Arial, sans-serif" font-size="16" fill="#94a3b8" text-anchor="middle" dominant-baseline="middle">
+    800 x 400
+  </text>
+</svg>
