@@ -12,7 +12,7 @@ interface WikiCardProps {
   title: string;
   author: string;
   date: string;
-  summary: string;
+  summary: string | null;
   href: string;
 }
 
