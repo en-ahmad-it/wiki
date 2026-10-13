@@ -1,4 +1,3 @@
-import type { CurrentUser } from "@stackframe/stack";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import summarizeArticle from "@/ai/summarize";
 import {
@@ -10,7 +9,8 @@ import redis from "@/cache";
 import * as authz from "@/db/authz";
 import db from "@/db/index";
 import { articles } from "@/db/schema";
-import { stackServerApp } from "@/stack/server";
+import { hexclaveServerApp } from "@/stack/server";
+import type {CurrentUser } from "@hexclave/next";
 
 // Mock dependencies
 vi.mock("@/db/index");
@@ -45,7 +45,7 @@ describe("Article Actions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Setup default mocks
-    vi.mocked(stackServerApp.getUser).mockResolvedValue(mockUser);
+    vi.mocked(hexclaveServerApp.getUser).mockResolvedValue(mockUser);
     vi.mocked(summarizeArticle).mockResolvedValue("Test summary");
     vi.mocked(redis.del).mockResolvedValue(1);
   });
@@ -77,7 +77,7 @@ describe("Article Actions", () => {
     });
 
     it("should throw error when user is not authenticated", async () => {
-      vi.mocked(stackServerApp.getUser).mockResolvedValue(null);
+      vi.mocked(hexclaveServerApp.getUser).mockResolvedValue(null);
 
       const articleData = {
         title: "Test Article",
@@ -150,7 +150,7 @@ describe("Article Actions", () => {
     });
 
     it("should throw error when user is not authenticated", async () => {
-      vi.mocked(stackServerApp.getUser).mockResolvedValue(null);
+      vi.mocked(hexclaveServerApp.getUser).mockResolvedValue(null);
 
       await expect(updateArticle("1", { title: "New Title" })).rejects.toThrow(
         "Unauthorized",
@@ -195,7 +195,7 @@ describe("Article Actions", () => {
     });
 
     it("should throw error when user is not authenticated", async () => {
-      vi.mocked(stackServerApp.getUser).mockResolvedValue(null);
+      vi.mocked(hexclaveServerApp.getUser).mockResolvedValue(null);
 
       await expect(deleteArticle("1")).rejects.toThrow("Unauthorized");
       expect(db.delete).not.toHaveBeenCalled();
