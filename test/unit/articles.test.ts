@@ -8,6 +8,7 @@ import {
 } from "@/app/actions/articles";
 import redis from "@/cache";
 import * as authz from "@/db/authz";
+import { ensureUserExists } from "@/db/ensure-user";
 import db from "@/db/index";
 import { articles } from "@/db/schema";
 import { hexclaveServerApp } from "@/stack/server";
@@ -18,7 +19,7 @@ vi.mock("@/stack/server");
 vi.mock("@/db/authz");
 vi.mock("@/cache");
 vi.mock("@/ai/summarize");
-vi.mock("@/db/sync-user");
+vi.mock("@/db/ensure-user");
 
 describe("Article Actions", () => {
   const mockUser = {
@@ -46,6 +47,7 @@ describe("Article Actions", () => {
     vi.clearAllMocks();
     // Setup default mocks
     vi.mocked(hexclaveServerApp.getUser).mockResolvedValue(mockUser);
+    vi.mocked(ensureUserExists).mockResolvedValue(undefined);
     vi.mocked(summarizeArticle).mockResolvedValue("Test summary");
     vi.mocked(redis.del).mockResolvedValue(1);
   });
