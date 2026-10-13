@@ -3,13 +3,13 @@ import { expect, test as setup } from "@playwright/test";
 const authFile = "playwright/.auth/user.json";
 
 setup("authenticate", async ({ page }) => {
-  const stackProjectId = process.env.NEXT_PUBLIC_STACK_PROJECT_ID;
-  const stackPublishableKey =
-    process.env.NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY;
+  const hexclaveProjectId = process.env.NEXT_PUBLIC_HEXCLAVE_PROJECT_ID;
+  const hexclavePublishableKey =
+    process.env.NEXT_PUBLIC_HEXCLAVE_PUBLISHABLE_CLIENT_KEY;
 
-  if (!stackProjectId || !stackPublishableKey) {
+  if (!hexclaveProjectId || !hexclavePublishableKey) {
     throw new Error(
-      "Stack credentials not found. Please set NEXT_PUBLIC_STACK_PROJECT_ID and NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY in your .env.test.local file",
+      "Hexclave credentials not found. Please set NEXT_PUBLIC_HEXCLAVE_PROJECT_ID and NEXT_PUBLIC_HEXCLAVE_PUBLISHABLE_CLIENT_KEY in your .env.test.local file",
     );
   }
 
@@ -22,7 +22,7 @@ setup("authenticate", async ({ page }) => {
   if (!testEmail || !testPassword) {
     console.warn("⚠️  TEST_USER_EMAIL and TEST_USER_PASSWORD not set.");
     console.warn(
-      "⚠️  Please create a test user in Stack and set these credentials.",
+      "⚠️  Please create a test user in Hexclave and set these credentials.",
     );
     console.warn("⚠️  Skipping authentication setup...");
     return;
@@ -62,8 +62,8 @@ setup("authenticate", async ({ page }) => {
       page
         .locator("text=New Article")
         .or(page.locator('[data-testid="user-menu"]'))
-        .or(page.getByText(/Wikimasters/i)) // ← الكلمة اللي تظهر في الواجهة
-        .or(page.getByText(/Ahmad Ismail/i)), // ← اسم المستخدم لو يظهر
+        .or(page.getByText(/Wikimasters/i))
+        .or(page.getByText(/Ahmad Ismail/i)),
     ).toBeVisible({ timeout: 15000 });
 
     console.log("✅ Authentication successful");
@@ -81,8 +81,8 @@ setup("authenticate", async ({ page }) => {
     throw new Error(
       "Failed to authenticate. Please check:\n" +
         "1. TEST_USER_EMAIL and TEST_USER_PASSWORD are correct\n" +
-        "2. The test user exists in your Stack project\n" +
-        "3. Stack selectors match the actual UI (check auth-error.png screenshot)\n" +
+        "2. The test user exists in your Hexclave project\n" +
+        "3. Hexclave selectors match the actual UI (check auth-error.png screenshot)\n" +
         `Error: ${error}`,
     );
   }
