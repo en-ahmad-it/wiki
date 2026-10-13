@@ -18,7 +18,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: package-lock.json
 
@@ -39,7 +39,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: package-lock.json
 
@@ -49,9 +49,8 @@ jobs:
 
       - name: Get branch expiration date as an env variable (2 weeks from now)
         id: get-expiration-date
-        run:
-          echo "EXPIRES_AT=$(date -u --date '+14 days' +'%Y-%m-%dT%H:%M:%SZ')"
-          >> "$GITHUB_ENV"
+        run: |
+          echo "EXPIRES_AT=$(date -u --date '+14 days' +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_ENV"
 
       - name: Create Neon Branch
         uses: neondatabase/create-branch-action@v6
@@ -103,7 +102,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: package-lock.json
 
@@ -113,9 +112,8 @@ jobs:
 
       - name: Get branch expiration date as an env variable (2 weeks from now)
         id: get-expiration-date
-        run:
-          echo "EXPIRES_AT=$(date -u --date '+14 days' +'%Y-%m-%dT%H:%M:%SZ')"
-          >> "$GITHUB_ENV"
+        run: |
+          echo "EXPIRES_AT=$(date -u --date '+14 days' +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_ENV"
 
       - name: Create Neon Branch
         uses: neondatabase/create-branch-action@v6
@@ -170,7 +168,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: package-lock.json
 

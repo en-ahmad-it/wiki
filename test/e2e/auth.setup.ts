@@ -69,7 +69,9 @@ setup("authenticate", async ({ page }) => {
 
     // 🟩 التحقق من أننا سجلنا الدخول فعليًا
     await expect(
-      page.getByText("New Article").or(page.locator('[data-testid="user-menu"]')),
+      page
+        .getByText("New Article")
+        .or(page.locator('[data-testid="user-menu"]')),
     ).toBeVisible({ timeout: 10000 });
 
     console.log("✅ Authentication successful");
