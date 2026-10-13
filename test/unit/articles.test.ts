@@ -1,3 +1,4 @@
+import type { CurrentUser } from "@hexclave/next";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import summarizeArticle from "@/ai/summarize";
 import {
@@ -10,7 +11,6 @@ import * as authz from "@/db/authz";
 import db from "@/db/index";
 import { articles } from "@/db/schema";
 import { hexclaveServerApp } from "@/stack/server";
-import type {CurrentUser } from "@hexclave/next";
 
 // Mock dependencies
 vi.mock("@/db/index");

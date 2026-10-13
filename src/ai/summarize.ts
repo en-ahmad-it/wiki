@@ -29,7 +29,6 @@ export default async function summarizeArticle(
   return article.split("\n").slice(0, 2).join(" ");
 }
 
-
 // import { generateText } from "ai";
 //this is a test environment check to avoid making actual API calls during testing to save tokens and speed up tests. It checks for common test environment variables like NODE_ENV, VITEST, and PLAYWRIGHT. If any of these are set, it returns true, indicating that the code is running in a test environment.
 // function isTestEnv() {
@@ -60,4 +59,3 @@ export default async function summarizeArticle(
 // }
 
 // export default summarizeArticle;
-
