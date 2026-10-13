@@ -45,8 +45,21 @@ setup("authenticate", async ({ page }) => {
 
     // Try to find and fill password field
     const passwordInput = page
-      .locator('input[type="password"], input[name="password"]')
+      .locator(
+        'input[type="password"], input[name="password"], input[autocomplete="current-password"]',
+      )
       .first();
+
+    // Some auth UIs are multi-step (email first, password second)
+    const hasPasswordInput = await passwordInput
+      .isVisible({ timeout: 2000 })
+      .catch(() => false);
+    if (!hasPasswordInput) {
+      const continueButton = page.locator('button[type="submit"]').first();
+      await continueButton.click();
+    }
+
+    await passwordInput.waitFor({ state: "visible", timeout: 10000 });
     await passwordInput.fill(testPassword);
 
     // Click the sign in button
@@ -71,8 +84,12 @@ setup("authenticate", async ({ page }) => {
   } catch (error) {
     console.error("❌ Authentication failed:", error);
 
-    // Take a screenshot for debugging
-    await page.screenshot({ path: "playwright/.auth/auth-error.png" });
+    // Take a screenshot for debugging when page is still available
+    if (!page.isClosed()) {
+      await page
+        .screenshot({ path: "playwright/.auth/auth-error.png" })
+        .catch(() => {});
+    }
 
     throw new Error(
       "Failed to authenticate. Please check:\n" +
