@@ -3,7 +3,7 @@ import { expect, test as setup } from "@playwright/test";
 const authFile = "playwright/.auth/user.json";
 
 setup("authenticate", async ({ page }) => {
-  // Check if we need Stack credentials
+  // ✅ تحقق من وجود مفاتيح Stack
   const stackProjectId = process.env.NEXT_PUBLIC_STACK_PROJECT_ID;
   const stackPublishableKey =
     process.env.NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY;
@@ -14,80 +14,74 @@ setup("authenticate", async ({ page }) => {
     );
   }
 
-  // Navigate to the sign-in page
-  await page.goto("/handler/sign-in");
-
-  // Wait for Stack's auth UI to load
+  // ✅ افتح صفحة تسجيل الدخول
+  await page.goto("/handler/sign-in", { waitUntil: "domcontentloaded" });
   await page.waitForLoadState("networkidle");
 
-  // Check if we have test user credentials
+  // ✅ تحقق من وجود بيانات المستخدم التجريبية
   const testEmail = process.env.TEST_USER_EMAIL;
   const testPassword = process.env.TEST_USER_PASSWORD;
 
   if (!testEmail || !testPassword) {
-    console.warn("⚠️  TEST_USER_EMAIL and TEST_USER_PASSWORD not set.");
-    console.warn(
-      "⚠️  Please create a test user in Stack and set these credentials.",
+    throw new Error(
+      "TEST_USER_EMAIL and TEST_USER_PASSWORD must be configured for E2E tests",
     );
-    console.warn("⚠️  Skipping authentication setup...");
-    return;
   }
 
-  // Stack's default email/password form selectors
-  // Note: These may need to be adjusted based on Stack's actual UI
   try {
-    // Try to find and fill email field
+    // 🟩 الخطوة الأولى: إدخال الإيميل
     const emailInput = page
       .locator('input[type="email"], input[name="email"]')
       .first();
-    await emailInput.waitFor({ timeout: 5000 });
+    await expect(emailInput).toBeVisible({ timeout: 5000 });
     await emailInput.fill(testEmail);
 
-    // Try to find and fill password field
+    // 🟩 الخطوة الثانية: التعامل مع واجهة تسجيل دخول متعددة الخطوات
     const passwordInput = page
       .locator(
         'input[type="password"], input[name="password"], input[autocomplete="current-password"]',
       )
       .first();
 
-    // Some auth UIs are multi-step (email first, password second)
     const hasPasswordInput = await passwordInput
       .isVisible({ timeout: 2000 })
       .catch(() => false);
+
     if (!hasPasswordInput) {
-      const continueButton = page.locator('button[type="submit"]').first();
+      const continueButton = page
+        .getByRole("button", { name: /continue|next|sign in/i })
+        .first();
       await continueButton.click();
     }
 
-    await passwordInput.waitFor({ state: "visible", timeout: 10000 });
+    // 🟩 الخطوة الثالثة: إدخال الباسورد
+    await expect(passwordInput).toBeVisible({ timeout: 10000 });
     await passwordInput.fill(testPassword);
 
-    // Click the sign in button
-    const signInButton = page.locator('button[type="submit"]').first();
+    // 🟩 الخطوة الرابعة: الضغط على زر تسجيل الدخول
+    const signInButton = page
+      .getByRole("button", { name: /sign in|log in|continue/i })
+      .last();
     await signInButton.click();
 
-    // Wait for redirect after successful login
-    // Should redirect to home page or the page we came from
-    await page.waitForURL(/^(?!.*handler).*$/, { timeout: 10000 });
+    // 🟩 الخطوة الخامسة: انتظار إعادة التوجيه بعد تسجيل الدخول
+    await page.waitForURL(/\/(?!handler)/, { timeout: 15000 });
 
-    // Verify we're logged in by checking for the user menu or "New Article" button
+    // 🟩 التحقق من أننا سجلنا الدخول فعليًا
     await expect(
-      page
-        .locator("text=New Article")
-        .or(page.locator('[data-testid="user-menu"]')),
-    ).toBeVisible({ timeout: 5000 });
+      page.getByText("New Article").or(page.locator('[data-testid="user-menu"]')),
+    ).toBeVisible({ timeout: 10000 });
 
     console.log("✅ Authentication successful");
 
-    // Save the authenticated state
+    // 🟩 حفظ حالة الجلسة
     await page.context().storageState({ path: authFile });
   } catch (error) {
     console.error("❌ Authentication failed:", error);
 
-    // Take a screenshot for debugging when page is still available
     if (!page.isClosed()) {
       await page
-        .screenshot({ path: "playwright/.auth/auth-error.png" })
+        .screenshot({ path: "playwright/.auth/auth-error.png", fullPage: true })
         .catch(() => {});
     }
 
