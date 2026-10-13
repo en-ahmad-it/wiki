@@ -57,7 +57,7 @@ setup("authenticate", async ({ page }) => {
 
     await page.waitForURL(/^(?!.*handler).*$/, { timeout: 10000 });
 
-    // ✅ تحقق من ظهور عناصر تدل على تسجيل الدخول
+    // ✅ تحقق من ظهور عناصر تدل على تسجيل الدخول.
     await expect(
       page
         .locator("text=New Article")
