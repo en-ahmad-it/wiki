@@ -1,4 +1,11 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
+
+// These tests run in the "chromium-unauthenticated" project, which explicitly
+// starts with an empty storageState (see playwright.config.ts). They must
+// never see a logged-in session.
+
+// WikiCard has no data-testid; article cards are links to /wiki/<id>.
+const articleLinks = (page: Page) => page.locator('main a[href^="/wiki/"]');
 
 test.describe("Authentication Flow (Unauthenticated)", () => {
   test("should display sign in and sign up buttons when not authenticated", async ({
@@ -6,12 +13,8 @@ test.describe("Authentication Flow (Unauthenticated)", () => {
   }) => {
     await page.goto("/");
 
-    // Check for sign in and sign up buttons
-    const signInButton = page.locator("text=Sign In");
-    const signUpButton = page.locator("text=Sign Up");
-
-    await expect(signInButton).toBeVisible();
-    await expect(signUpButton).toBeVisible();
+    await expect(page.getByTestId("sign-in-btn")).toBeVisible();
+    await expect(page.getByTestId("sign-up-btn")).toBeVisible();
   });
 
   test("should not show New Article button when not authenticated", async ({
@@ -19,9 +22,9 @@ test.describe("Authentication Flow (Unauthenticated)", () => {
   }) => {
     await page.goto("/");
 
-    // New Article button should not be visible without auth
-    const newArticleButton = page.locator("text=New Article");
-    await expect(newArticleButton).not.toBeVisible();
+    // Must not exist at all while logged out.
+    await expect(page.getByTestId("new-article-btn")).toHaveCount(0);
+    await expect(page.getByTestId("user-menu")).toHaveCount(0);
   });
 
   test("should navigate to Stack auth when clicking sign in", async ({
@@ -29,12 +32,10 @@ test.describe("Authentication Flow (Unauthenticated)", () => {
   }) => {
     await page.goto("/");
 
-    // Click sign in button
-    const signInButton = page.locator("text=Sign In");
-    await signInButton.click();
+    await page.getByTestId("sign-in-btn").click();
 
-    // Should redirect to Stack auth page (handler route)
-    await expect(page).toHaveURL(/.*handler.*sign-in.*/);
+    // Nav links to /handler/sign-in (Stack/Hexclave handler route).
+    await expect(page).toHaveURL(/\/handler\/sign-in/);
   });
 
   test("should navigate to Stack auth when clicking sign up", async ({
@@ -42,34 +43,22 @@ test.describe("Authentication Flow (Unauthenticated)", () => {
   }) => {
     await page.goto("/");
 
-    // Click sign up button
-    const signUpButton = page.locator("text=Sign Up");
-    await signUpButton.click();
+    await page.getByTestId("sign-up-btn").click();
 
-    // Should redirect to Stack auth page (handler route)
-    await expect(page).toHaveURL(/.*handler.*sign-up.*/);
+    await expect(page).toHaveURL(/\/handler\/sign-up/);
   });
 
   test("should protect article creation route", async ({ page }) => {
-    // Try to access edit page without authentication
+    // The page itself performs a server-side redirect to the auth handler.
     await page.goto("/wiki/edit/new");
 
-    // Should redirect to auth handler
-    await page.waitForURL(/.*handler.*/, { timeout: 5000 });
-
-    const url = page.url();
-    expect(url).toMatch(/handler/);
+    await expect(page).toHaveURL(/\/handler\/sign-in/, { timeout: 15_000 });
   });
 
   test("should protect article edit routes", async ({ page }) => {
-    // Try to access an edit page without authentication
     await page.goto("/wiki/edit/1");
 
-    // Should redirect to auth handler
-    await page.waitForURL(/.*handler.*/, { timeout: 5000 });
-
-    const url = page.url();
-    expect(url).toMatch(/handler/);
+    await expect(page).toHaveURL(/\/handler\/sign-in/, { timeout: 15_000 });
   });
 
   test("should allow viewing articles without authentication", async ({
@@ -77,16 +66,16 @@ test.describe("Authentication Flow (Unauthenticated)", () => {
   }) => {
     await page.goto("/");
 
-    // Home page should be accessible
     await expect(page).toHaveURL("/");
+    await expect(page.getByRole("link", { name: "Wikimasters" })).toBeVisible();
+    await expect(page.getByTestId("sign-in-btn")).toBeVisible();
 
-    // Should see the Wikimasters title link (not <title>)
-    const titleLink = page.getByRole("link", { name: "Wikimasters" });
-    await expect(titleLink).toBeVisible();
-
-    // Should still see sign in/up buttons
-    const signInButton = page.locator("text=Sign In");
-    await expect(signInButton).toBeVisible();
+    // global-setup.ts seeds articles, so the home page must list content —
+    // this test must not silently pass on an empty page.
+    await expect(
+      articleLinks(page).first(),
+      "expected at least one article on the home page (global-setup seeds 3)",
+    ).toBeVisible();
   });
 
   test("should allow viewing individual articles without authentication", async ({
@@ -94,19 +83,21 @@ test.describe("Authentication Flow (Unauthenticated)", () => {
   }) => {
     await page.goto("/");
 
-    // Try to find and click on an article if it exists
-    const articleCard = page.locator('[data-testid="article-card"]').first();
-    const hasArticles = await articleCard.isVisible().catch(() => false);
+    const firstArticle = articleLinks(page).first();
+    await expect(
+      firstArticle,
+      "expected at least one seeded article to open",
+    ).toBeVisible();
+    await firstArticle.click();
 
-    if (hasArticles) {
-      await articleCard.click();
+    // Seeded and test-created articles live at /wiki/<numeric id>.
+    await expect(page).toHaveURL(/\/wiki\/\d+/);
 
-      // Should be able to view the article
-      await expect(page).toHaveURL(/\/wiki\/\d+/);
+    // Article content renders.
+    await expect(page.locator("h1")).toBeVisible();
 
-      // Should still not see New Article button
-      const newArticleButton = page.locator("text=New Article");
-      await expect(newArticleButton).not.toBeVisible();
-    }
+    // Still logged out: no authenticated UI on the article page.
+    await expect(page.getByTestId("new-article-btn")).toHaveCount(0);
+    await expect(page.getByTestId("sign-in-btn")).toBeVisible();
   });
 });

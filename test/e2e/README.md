@@ -69,9 +69,9 @@ Get this from: https://console.neon.tech/
 **Stack Authentication:**
 
 ```bash
-NEXT_PUBLIC_STACK_PROJECT_ID=your-stack-project-id
-NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY=your-stack-publishable-key
-STACK_SECRET_SERVER_KEY=your-stack-secret-key
+NEXT_PUBLIC_HEXCLAVE_PROJECT_ID=your-hexclave-project-id
+NEXT_PUBLIC_HEXCLAVE_PUBLISHABLE_CLIENT_KEY=your-hexclave-publishable-key
+HEXCLAVE_SECRET_SERVER_KEY=your-hexclave-secret-key
 ```
 
 Get these from: https://app.stack-auth.com/
