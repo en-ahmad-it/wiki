@@ -33,7 +33,11 @@ export async function NavBar() {
               <>
                 {/* New Article Button */}
                 <NavigationMenuItem>
-                  <Button asChild variant="outline" data-testid="new-article-btn">
+                  <Button
+                    asChild
+                    variant="outline"
+                    data-testid="new-article-btn"
+                  >
                     <Link href="/wiki/edit/new">New Article</Link>
                   </Button>
                 </NavigationMenuItem>
@@ -47,11 +51,7 @@ export async function NavBar() {
               <>
                 {/* Sign In */}
                 <NavigationMenuItem>
-                  <Button
-                    asChild
-                    variant="outline"
-                    data-testid="sign-in-btn"
-                  >
+                  <Button asChild variant="outline" data-testid="sign-in-btn">
                     <Link href="/handler/sign-in">Sign In</Link>
                   </Button>
                 </NavigationMenuItem>
